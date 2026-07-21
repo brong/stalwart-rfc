@@ -320,13 +320,15 @@ if the server changes one of these keyword flags on one message
 (for example, with a STORE command), the server MUST make the same
 change on all other messages that have the same EMAILID.
 
-\Recent and \Deleted have no JMAP keyword and thus are not subject
-to this constraint.  \Recent is maintained per message and may
-differ between copies that share an EMAILID.  A change to \Deleted
-on one message MUST NOT be propagated to other messages that share
-the same EMAILID; each such message keeps its own independent
-\Deleted state.  See {{deleted-flag}} for the reasoning behind this
-rule.
+\Recent and \Deleted have no JMAP keyword and are treated differently.
+
+\Recent is generated per connection and may differ between copies
+that share an EMAILID.
+
+A change to \Deleted on one message MUST NOT be propagated to other
+messages that share the same EMAILID; each such message keeps its own
+independent \Deleted state.  See {{deleted-flag}} for the reasoning
+behind this rule.
 
 A COPY or MOVE command {{RFC6851}} is allowed to create a new
 EMAILID for the destination message.  The server SHOULD preserve
@@ -337,18 +339,15 @@ The server MAY assign the same EMAILID as an existing message upon
 APPEND (e.g., if it detects that the new message has exactly
 identical content to that of an existing message).
 
-NOTE: A server can give each message a different EMAILID, so that no
-two messages have the same EMAILID.  For example, the server
-calculates the EMAILID from the {MAILBOXID, UID} pair.  Then the
-server does not have to keep the flags the same across copies of
-identical content.  This is allowed because two messages with
-identical content are not required to have the same EMAILID.  The
-opposite constraint stays: within one ACCOUNTID, two messages with
-different content MUST NOT have the same EMAILID.  This document does
-not specify a way to STORE by EMAILID.  When the server also
-advertises JMAPACCESS, see {{jmapaccess}} for how the flags of
-messages with the same EMAILID map to the JMAP keywords of the
-Email.
+NOTE: A server can sidestep the same-flags requirement by giving every
+message a distinct EMAILID, for example by calculating it from the
+{MAILBOXID, UID} pair.  The requirement only constrains messages that
+share an EMAILID, so copies of identical content are then free to carry
+different flags.
+
+When the server also advertises JMAPACCESS, see {{jmapaccess}} for how
+the flags of messages with the same EMAILID map to the JMAP keywords of
+the Email.
 
 ## THREADID Identifier for Related Messages {#threadid}
 
